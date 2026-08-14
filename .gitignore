@@ -1,0 +1,4 @@
+**/bin/
+**/obj/
+public/fable/
+.DS_Store

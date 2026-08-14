@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="App.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fable.Core" Version="5.2.0" />
+    <PackageReference Include="Fable.Browser.Dom" Version="2.20.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,72 @@
+name: SAFE Fable E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the fixture and pinned OptoSync clients
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '8.0.x'
+      - name: Set up Node for the Fable output check
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24'
+      - name: Verify immutable source pins
+        run: |
+          test "$(git -C vendor/opto-sync-clients rev-parse HEAD)" = "$(jq -r .clients opto-sync-pin.json)"
+          test "$(git -C vendor/opto-sync-clients/syncer.c rev-parse HEAD)" = "$(jq -r .core opto-sync-pin.json)"
+      - name: Build the pinned native core
+        run: |
+          cc -shared -fPIC -O2 \
+            -I vendor/opto-sync-clients/syncer.c/core/include \
+            vendor/opto-sync-clients/syncer.c/core/src/syncer.c \
+            vendor/opto-sync-clients/syncer.c/core/src/yyjson.c \
+            -o /tmp/libsyncer-safe-fable.so
+      - name: Compile C#, F#, Giraffe, and Fable
+        run: |
+          dotnet tool restore
+          dotnet build src/Client/Client.fsproj --configuration Release
+          dotnet build src/Server/Server.fsproj --configuration Release
+          dotnet fable src/Client/Client.fsproj --outDir public/fable --lang javascript
+          node --check public/service-worker.js
+          node --check public/fable/App.js
+      - name: Exercise native background replay and the live HTTP stack
+        env:
+          OPTO_SYNC_NATIVE_LIBRARY: /tmp/libsyncer-safe-fable.so
+        run: |
+          dotnet run --project src/Server/Server.fsproj --configuration Release --no-build -- --self-test
+          dotnet run --project src/Server/Server.fsproj --configuration Release --no-build -- --urls http://127.0.0.1:5078 >/tmp/safe-fable-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:5078/health >/tmp/safe-fable-health.json; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'Giraffe' /tmp/safe-fable-health.json
+          curl -fsS http://127.0.0.1:5078/ | grep -q 'SAFE/Fable OptoSync E2E'
+          curl -fsS http://127.0.0.1:5078/service-worker.js | grep -q 'opto-sync-drain'
+          response="$(curl -fsS -X POST http://127.0.0.1:5078/sync \
+            -H 'content-type: application/json' \
+            --data '{"lane":"web-primary","recordId":"doc-1","baseJson":"{\"id\":\"doc-1\",\"title\":\"base\",\"updatedAt\":\"2026-08-14T10:00:00Z\"}","incomingJson":"{\"id\":\"doc-1\",\"title\":\"fable\",\"updatedAt\":\"2026-08-14T11:00:00Z\"}"}')"
+          test "$(printf '%s' "$response" | jq -r '.mergedJson | fromjson | .title')" = "fable"
+          kill "$server_pid"
+          wait "$server_pid" || true
+          trap - EXIT
