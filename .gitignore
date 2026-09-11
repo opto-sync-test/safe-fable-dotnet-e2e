@@ -2,3 +2,7 @@
 **/obj/
 public/fable/
 .DS_Store
+
+# Local temporary directories and repository-owned worktrees
+tmp/
+temp/
