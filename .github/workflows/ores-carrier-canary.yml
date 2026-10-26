@@ -1,0 +1,12 @@
+name: Ores carrier runner canary
+on:
+  push:
+    branches:
+      - ci/ores-net-parity-runner-canary-20261026
+permissions:
+  contents: read
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ORES_CARRIER_RUNNER_EXECUTED
