@@ -1,0 +1,121 @@
+name: Shared actor arena lifecycle v1 source-free parity
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/SHARED_ACTOR_ARENAS_V1.md'
+      - 'contracts/v1/actor_arena_lifecycle_v1.json'
+      - 'scripts/verify_actor_arena_lifecycle_v1.py'
+      - 'scripts/test_actor_arena_lifecycle_v1.py'
+      - '.github/workflows/actor-arena-lifecycle-v1.yml'
+  push:
+    paths:
+      - 'contracts/v1/SHARED_ACTOR_ARENAS_V1.md'
+      - 'contracts/v1/actor_arena_lifecycle_v1.json'
+      - 'scripts/verify_actor_arena_lifecycle_v1.py'
+      - 'scripts/test_actor_arena_lifecycle_v1.py'
+      - '.github/workflows/actor-arena-lifecycle-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-parity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Assert exact source head and immutable parity blobs
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse --verify HEAD)" = "$EXPECTED_HEAD"
+          test -n "$(git rev-parse 'HEAD^{tree}')"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          test "$(git hash-object contracts/v1/SHARED_ACTOR_ARENAS_V1.md)" = "c696c696ff8641e4b12bb7d4aa9cbf70e3002578"
+          test "$(git hash-object contracts/v1/actor_arena_lifecycle_v1.json)" = "b0c2f086de90ccf9ee9c36edb6c83732c451e411"
+          test "$(git hash-object scripts/verify_actor_arena_lifecycle_v1.py)" = "e65f0ff932cc4fb4f1d199fc2f089683c2b02b0b"
+          test "$(git hash-object scripts/test_actor_arena_lifecycle_v1.py)" = "dba650531948d9a482bfed294bd04e1b6b6cb209"
+      - name: Execute 40 adversarial actor arena checks in three rounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -I -m py_compile scripts/verify_actor_arena_lifecycle_v1.py scripts/test_actor_arena_lifecycle_v1.py
+          python3 scripts/verify_actor_arena_lifecycle_v1.py
+          python3 -I - <<'PY'
+          import json
+          import os
+          import sys
+          import unittest
+          from pathlib import Path
+          sys.path.insert(0, str(Path("scripts").resolve()))
+          from test_actor_arena_lifecycle_v1 import ActorArenaLifecycleV1Test
+          counts = []
+          for round_id in (1, 2, 3):
+              suite = unittest.defaultTestLoader.loadTestsFromTestCase(ActorArenaLifecycleV1Test)
+              if suite.countTestCases() != 40:
+                  raise SystemExit("actor arena test inventory differs from pinned 40")
+              result = unittest.TextTestRunner(verbosity=1).run(suite)
+              if (result.testsRun != 40 or not result.wasSuccessful()
+                      or result.skipped or result.expectedFailures or result.unexpectedSuccesses):
+                  raise SystemExit("actor arena source-free tests failed or skipped")
+              counts.append(result.testsRun)
+              print(f"ACTOR_ARENA_SOURCEFREE_ROUND_{round_id}_PASS=40", flush=True)
+          Path(os.environ["RUNNER_TEMP"], "actor-arena-rounds.json").write_text(
+              json.dumps({"round_counts": counts, "executed_total": sum(counts)}, sort_keys=True))
+          PY
+      - name: Emit bounded source-free parity receipt
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_REPO_ID: ${{ github.repository_id }}
+        run: |
+          set -euo pipefail
+          python3 -I - <<'PY'
+          import json
+          import os
+          import pathlib
+          import subprocess
+          def git(*args):
+              return subprocess.check_output(("git", *args), text=True).strip()
+          paths = (
+              "contracts/v1/SHARED_ACTOR_ARENAS_V1.md",
+              "contracts/v1/actor_arena_lifecycle_v1.json",
+              "scripts/verify_actor_arena_lifecycle_v1.py",
+              "scripts/test_actor_arena_lifecycle_v1.py")
+          blobs = {p: git("hash-object", p) for p in paths}
+          counts = json.loads((pathlib.Path(os.environ["RUNNER_TEMP"]) /
+                               "actor-arena-rounds.json").read_text())
+          if git("rev-parse", "HEAD") != os.environ["EXPECTED_HEAD"]:
+              raise SystemExit("receipt HEAD mismatch")
+          if counts != {"round_counts": [40, 40, 40], "executed_total": 120}:
+              raise SystemExit("receipt test inventory mismatch")
+          receipt = {
+              "schema": "oreslang.actor_arena_lifecycle_sourcefree_v1",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "repository_id": int(os.environ["EXPECTED_REPO_ID"]),
+              "head_sha": git("rev-parse", "HEAD"),
+              "tree_sha": git("rev-parse", "HEAD^{tree}"),
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "git_blobs": blobs,
+              "round_counts": counts["round_counts"],
+              "executed_total": 120,
+              "source_free_only": True,
+              "native_backend_certified": False,
+              "guest_runtime_certified": False,
+              "callback_wiring_certified": False,
+              "zero_gc_certified": False}
+          (pathlib.Path(os.environ["RUNNER_TEMP"]) / "actor-arena-lifecycle-v1.json").write_text(
+              json.dumps(receipt, sort_keys=True, indent=2) + "\n")
+          PY
+      - name: Upload source-free parity receipt only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: actor-arena-lifecycle-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/actor-arena-lifecycle-v1.json
+          if-no-files-found: error
+          retention-days: 7

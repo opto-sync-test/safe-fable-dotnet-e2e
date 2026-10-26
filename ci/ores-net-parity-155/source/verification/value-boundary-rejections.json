@@ -1,0 +1,17 @@
+{
+  "tuple-index": "pub fnc main(): int { return (5,3,1)[0]; }",
+  "array-index": "pub fnc main(): int { return [5,3,1][0]; }",
+  "record-destructure": "pub fnc main(): int { const {left,right} = infer struct{left:19,right:23}; return left+right; }",
+  "tuple-destructure": "pub fnc main(): int { const [a,b] = (19,23); return a+b; }",
+  "tuple-spread": "fnc add(int a,int b):int{return a+b;} pub fnc main():int{return add(...(19,23));}",
+  "call-method": "fnc add(int a,int b):int{return a+b;} pub fnc main():int{return add.call((19,23));}",
+  "template-string": "pub fnc main():int{ const name = \"Ada\"; const s = `hello ${name}`; return 42; }",
+  "async-await": "async fnc answer():int{return 42;} pub async fnc main():int{return await answer();}",
+  "suspend-boundary": "suspends fnc answer():int{return 42;} pub fnc main():int{return answer();}",
+  "if-binding": "pub fnc main():int{if 42 as let value when value>0 {return value;} else {return 0; fi}",
+  "while-binding": "pub fnc main():int{while 0 as let value when value>0 {return value;} return 42;}",
+  "map-ordered-assumption": "pub fnc main():int{ const map = new Map<string,int>(); return map.keys()[0]; }",
+  "nonboolean-condition": "pub fnc main():int{if 42 {return 1;} fi return 0;}",
+  "predicate-capture": "fnc ready(int v):bool{return v>0;} pub fnc main():int{if ready(42 as let value) {return value;} else {return 0;fi}",
+  "pattern-condition": "pub fnc main():int{if let Some(value)=Some(42) {return value;} else {return 0;fi}"
+}

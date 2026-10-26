@@ -1,0 +1,49 @@
+{
+  "contract": "oreslang.sendable-serializable.v1",
+  "status": "normative_security_invariants_not_feature_support",
+  "boundaries": {
+    "actor_data": {
+      "requirements": ["compiler_sealed_sendable", "resolved_nominal_type", "receiver_pinned_codec_if_wire", "owned_snapshot_or_exclusive_move", "quota_before_admission", "atomic_move_commit"],
+      "format": "messagepack_v2_only_if_implemented",
+      "forbid": ["borrow", "raw_pointer", "mutable_alias", "actor_ref", "actor_group_permit", "supervisor_control", "network_codec_object", "host_handle", "unproven_option_result"],
+      "unimplemented_policy": "reject_before_enqueue"
+    },
+    "network_data": {
+      "requirements": ["serializable_for_exact_format", "pinned_schema_and_version", "bounded_encode_decode", "independent_io_permission", "owned_snapshot"],
+      "formats": ["json", "messagepack_v2", "protobuf"],
+      "unimplemented_policy": "reject_before_io"
+    },
+    "supervisor_control": {
+      "requirements": ["runtime_minted_authority", "target_and_incarnation_scoped", "separate_control_lane", "revocation_or_replay_check"],
+      "forbid": ["actor_data_envelope", "network_data_codec", "userland_serializable", "userland_sendable_authorization"],
+      "unimplemented_policy": "reject_without_data_fallback"
+    }
+  },
+  "invariants": {
+    "sendable_is_not_serializable": true,
+    "serializable_is_not_sendable": true,
+    "shared_safe_is_not_sendable": true,
+    "codec_objects_are_not_data": true,
+    "source_imports_and_generics_are_resolved_before_admission": true,
+    "incoming_bytes_never_select_type_or_codec": true,
+    "schema_hash_is_not_an_authentication_mac": true,
+    "receiver_pins_schema_before_first_send": true,
+    "failed_admission_does_not_consume_sender_ownership": true,
+    "partial_mailbox_admission_is_forbidden": true,
+    "capabilities_cannot_be_nested_in_data": true,
+    "unsupported_shapes_fail_closed": true
+  },
+  "wire_profile": {
+    "portable_scalar_subset": ["bool", "signed_i64", "finite_f64", "valid_utf8"],
+    "typed_collections": ["tuple", "fixed_array", "fixed_list", "array", "list"],
+    "messagepack_wire_major": 2,
+    "messagepack_envelope_fields": ["wire_major", "schema_id", "shape_sha256", "payload"],
+    "unsupported_without_verified_runtime_codec": ["option", "result", "record", "enum", "class", "unsigned_integer", "bigint", "decimal", "complex", "capability"],
+    "invalid_bytes_reject": ["invalid_utf8", "noncanonical_numbers", "oversized_lengths", "wrong_shape", "schema_mismatch", "wire_downgrade"]
+  },
+  "verification": {
+    "categories": ["positive_scalar", "nested_capability_reject", "network_without_permission_reject", "control_in_data_reject", "schema_version_mismatch_reject", "sender_snapshot_mutation", "rejected_send_ownership_rollback", "bounded_decode", "generation_replay_reject", "cross_backend_golden_bytes"],
+    "requires_executable_code_to_claim_implemented": true,
+    "unimplemented_feature_must_be_marked_unsupported": true
+  }
+}

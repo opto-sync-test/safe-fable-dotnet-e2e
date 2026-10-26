@@ -1,0 +1,37 @@
+name: Nominal method ABI reference (source owned)
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/nominal_method_slot_abi_v1.json'
+      - 'contracts/v1/test_nominal_method_slot_abi_v1.py'
+      - 'src/main/java/dev/oreslang/ast/Ast.java'
+      - 'src/main/java/dev/oreslang/nodes/OresEvalRootNode.java'
+      - 'src/main/java/dev/oreslang/types/**'
+      - 'src/main/cpp/oreslang/types/**'
+      - 'tests/nominal_*'
+      - 'compiler/**'
+      - 'verification/**'
+      - '.github/workflows/nominal-method-abi.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  golden-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact source-owned candidate (no persisted token)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Assert checkout matches source candidate commit
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Verify nominal ABI reference and fail-closed vectors
+        run: |
+          python3 -B -m unittest discover -s contracts/v1 -p 'test_nominal_method_slot_abi_v1.py' -v
+          python3 -B -O -m unittest discover -s contracts/v1 -p 'test_nominal_method_slot_abi_v1.py' -v

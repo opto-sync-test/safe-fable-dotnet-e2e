@@ -1,0 +1,12 @@
+{
+  "cpu-sync-value": "pub fnc main():int{return cpu { 42 };}",
+  "gpu-sync-value": "pub fnc main():int{return gpu { 42 };}",
+  "task-default-future": "pub fnc main():int{let Future<int> f = task { 42 }; return await f;}",
+  "cpu-task-future": "pub fnc main():int{let Future<int> f = cpu task { 42 }; return await f;}",
+  "gpu-task-future": "pub fnc main():int{let Future<int> f = gpu task { 42 }; return await f;}",
+  "legacy-nb-default": "pub fnc main():int{let Future<int> f = nb { 42 }; return await f;}",
+  "legacy-nb-cpu": "pub fnc main():int{let Future<int> f = nb cpu { 42 }; return await f;}",
+  "legacy-nb-gpu": "pub fnc main():int{let Future<int> f = nb gpu { 42 }; return await f;}",
+  "gpu-cpu-gpu-nested": "pub fnc main():int{return gpu { cpu { gpu { 42 } } };}",
+  "empty-gpu-task-reject": "pub fnc main():void{gpu task {};}"
+}

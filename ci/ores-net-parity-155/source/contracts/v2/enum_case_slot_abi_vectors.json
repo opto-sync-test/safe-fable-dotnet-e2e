@@ -1,0 +1,143 @@
+{
+  "version": "enum-case-slot-abi-v2",
+  "status": "host-reference-only-not-guest-executable",
+  "warning": "Only compiler-authenticated static type identities are suitable for binding. No source runtime case multimethod.",
+  "bounds": {
+    "max_parameters": 64,
+    "max_candidates": 128,
+    "max_enum_cases": 1024,
+    "max_registered_enums": 4096,
+    "max_identity_utf8_bytes": 512
+  },
+  "vectors": [
+    {
+      "id": "case-A-module",
+      "domain": "MODULE",
+      "owner": "root.module",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "root.Foo",
+          "case": "A"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos26_4d4f44554c4511_726f6f742e6d6f64756c653_666f6fa2_C8_726f6f742e466f6f1_41F3_696e74"
+    },
+    {
+      "id": "case-B-module",
+      "domain": "MODULE",
+      "owner": "root.module",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "root.Foo",
+          "case": "B"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos26_4d4f44554c4511_726f6f742e6d6f64756c653_666f6fa2_C8_726f6f742e466f6f1_42F3_696e74"
+    },
+    {
+      "id": "whole-enum-fallback",
+      "domain": "MODULE",
+      "owner": "root.module",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "ENUM",
+          "identity": "root.Foo"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos26_4d4f44554c4511_726f6f742e6d6f64756c653_666f6fa2_E8_726f6f742e466f6fF3_696e74"
+    },
+    {
+      "id": "other-module-identical-case",
+      "domain": "MODULE",
+      "owner": "root.other",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "root.Foo",
+          "case": "A"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos26_4d4f44554c4510_726f6f742e6f746865723_666f6fa2_C8_726f6f742e466f6f1_41F3_696e74"
+    },
+    {
+      "id": "same-case-other-nominal-enum",
+      "domain": "MODULE",
+      "owner": "root.module",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "other.Foo",
+          "case": "A"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos26_4d4f44554c4511_726f6f742e6d6f64756c653_666f6fa2_C9_6f746865722e466f6f1_41F3_696e74"
+    },
+    {
+      "id": "instance-vs-module",
+      "domain": "INSTANCE",
+      "owner": "root.module",
+      "name": "foo",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "root.Foo",
+          "case": "A"
+        },
+        {
+          "kind": "FIXED",
+          "identity": "int"
+        }
+      ],
+      "expected": "eos28_494e5354414e434511_726f6f742e6d6f64756c653_666f6fa2_C8_726f6f742e466f6f1_41F3_696e74"
+    },
+    {
+      "id": "static-method",
+      "domain": "STATIC",
+      "owner": "root.module.C",
+      "name": "handle",
+      "params": [
+        {
+          "kind": "CASE",
+          "identity": "root.Foo",
+          "case": "A"
+        }
+      ],
+      "expected": "eos26_53544154494313_726f6f742e6d6f64756c652e436_68616e646c65a1_C8_726f6f742e466f6f1_41"
+    },
+    {
+      "id": "zero-arity",
+      "domain": "MODULE",
+      "owner": "root.module",
+      "name": "heartbeat",
+      "params": [],
+      "expected": "eos26_4d4f44554c4511_726f6f742e6d6f64756c659_686561727462656174a0_"
+    }
+  ]
+}

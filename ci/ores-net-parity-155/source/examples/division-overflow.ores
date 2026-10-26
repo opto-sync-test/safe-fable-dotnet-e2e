@@ -1,0 +1,4 @@
+// Valid i64 operands; dividing minimum signed value by -1 must trap.
+define pub fnc main() : int {
+    return -9223372036854775808 / -1;
+}

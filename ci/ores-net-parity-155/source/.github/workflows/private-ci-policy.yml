@@ -1,0 +1,146 @@
+name: Private CI export policy
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  private-ci-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Bind policy validation to exact source revision
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git diff --quiet --exit-code
+          test -z "$(git ls-files --others --exclude-standard)"
+          echo "PRIVATE_CI_POLICY_SOURCE_TREE=$(git rev-parse 'HEAD^{tree}')"
+      - name: Validate fail-closed export policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, re
+          from pathlib import Path
+
+          owner="@ORESoftware"
+
+          def read_regular(path, max_bytes=64 * 1024):
+              target=Path(path)
+              if not target.is_file() or target.is_symlink():
+                  raise SystemExit("private CI policy input must be a regular non-symlink file: " + path)
+              raw=target.read_bytes()
+              if (not raw or len(raw)>max_bytes or raw.startswith(b"\xef\xbb\xbf")
+                      or b"\x00" in raw):
+                  raise SystemExit("private CI policy input bytes invalid: " + path)
+              try:
+                  return raw.decode("utf-8")
+              except UnicodeError as exc:
+                  raise SystemExit("private CI policy input must be UTF-8: " + path) from exc
+
+          def no_duplicate_keys(pairs):
+              out={}
+              for key,value in pairs:
+                  if key in out:
+                      raise SystemExit("duplicate JSON key in private CI policy")
+                  out[key]=value
+              return out
+
+          def read_json(path):
+              try:
+                  return json.loads(read_regular(path), object_pairs_hook=no_duplicate_keys)
+              except (ValueError, RecursionError) as exc:
+                  raise SystemExit("invalid private CI JSON: " + path) from exc
+
+          paths=[
+              "/.github/CODEOWNERS",
+              "/.github/private-ci-approved-repositories.txt",
+              "/.github/private-ci-approved-source-snapshots.txt",
+              "/.github/private-ci-independent-reviewer.json",
+              "/.github/private-ci-required-checks.json",
+              "/.github/workflows/private-ci-policy.yml",
+          ]
+          for protected_path in paths:
+              read_regular("." + protected_path)
+          codeowner_lines=read_regular(".github/CODEOWNERS").splitlines()
+          rules=[x.strip() for x in codeowner_lines
+                 if x.strip() and not x.lstrip().startswith("#")]
+          if rules[-len(paths):] != [f"{p} {owner}" for p in paths]:
+              raise SystemExit("private CI CODEOWNERS final block mismatch")
+          if len(rules)<=len(paths) or rules[-len(paths)-1] != "/.github/workflows/ @ORESoftware":
+              raise SystemExit("missing workflow directory CODEOWNERS wildcard")
+
+          def entries(path):
+              active=[]
+              for line in read_regular(path).splitlines():
+                  if not line or line.startswith("#"):
+                      continue
+                  if line != line.strip():
+                      raise SystemExit("approval entry has surrounding whitespace: " + path)
+                  active.append(line)
+              return active
+
+          repos=entries(".github/private-ci-approved-repositories.txt")
+          rr=re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]* [1-9][0-9]{0,19}$")
+          if any(not rr.fullmatch(x) for x in repos):
+              raise SystemExit("invalid destination policy")
+          names=[x.split()[0].casefold() for x in repos]
+          repo_ids=[x.split()[1] for x in repos]
+          if len(names)!=len(set(names)) or len(repo_ids)!=len(set(repo_ids)):
+              raise SystemExit("duplicate destination policy")
+
+          snaps=entries(".github/private-ci-approved-source-snapshots.txt")
+          sr=re.compile(r"^[0-9a-f]{40} [0-9a-f]{40} [1-9][0-9]{0,19}$")
+          if any(not sr.fullmatch(x) for x in snaps):
+              raise SystemExit("invalid snapshot policy")
+          if len(snaps)!=len(set(snaps)):
+              raise SystemExit("duplicate snapshot policy")
+
+          reviewer=read_json(".github/private-ci-independent-reviewer.json")
+          expected_keys={"schema","enabled","minimumPermission","disallowedReviewerIds","reviewer"}
+          if (set(reviewer)!=expected_keys or type(reviewer.get("schema")) is not int
+                  or reviewer["schema"]!=2 or type(reviewer.get("enabled")) is not bool
+                  or reviewer.get("minimumPermission") not in {"write","maintain","admin"}):
+              raise SystemExit("invalid independent reviewer policy")
+          blocked=reviewer.get("disallowedReviewerIds")
+          if (not isinstance(blocked,list) or len(blocked)!=2
+                  or any(type(x) is not int or x<=0 for x in blocked)
+                  or set(blocked)!={11139560,2148448}):
+              raise SystemExit("invalid independent reviewer denylist")
+          if reviewer["enabled"] is False:
+              if reviewer["reviewer"] is not None or repos or snaps:
+                  raise SystemExit("approvals require enabled independent reviewer")
+          else:
+              who=reviewer["reviewer"]
+              if (not isinstance(who,dict) or set(who)!={"login","id"}
+                      or not isinstance(who.get("login"),str)
+                      or re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?",who["login"]) is None
+                      or type(who.get("id")) is not int or who["id"]<=0
+                      or who["id"] in blocked):
+                  raise SystemExit("invalid independent reviewer identity")
+              if len(repos)>1 or len(snaps)>1:
+                  raise SystemExit("only one private CI canary may be active")
+              if bool(repos) != bool(snaps):
+                  raise SystemExit("destination and snapshot approvals must activate together")
+              if repos and repos[0].split()[1] != snaps[0].split()[2]:
+                  raise SystemExit("destination and snapshot repository IDs differ")
+
+          data=read_json(".github/private-ci-required-checks.json")
+          if (set(data)!={"schema","checks"} or type(data.get("schema")) is not int
+                  or data["schema"]!=1 or not isinstance(data["checks"],list) or len(data["checks"])!=1):
+              raise SystemExit("invalid required-check schema")
+          one=data["checks"][0]
+          if (not isinstance(one,dict) or set(one)!={"context","appId"}
+                  or one.get("context")!="private-ci-policy" or one.get("appId")!=15368):
+              raise SystemExit("private-ci-policy must be bound to GitHub Actions app 15368")
+          print("private CI export policy: PASS")
+          PY

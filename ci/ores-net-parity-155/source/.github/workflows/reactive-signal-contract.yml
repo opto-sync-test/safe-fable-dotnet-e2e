@@ -1,0 +1,19 @@
+name: Reactive signal contract
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/reactive-signal-v1.json'
+      - 'contracts/v1/verify_reactive_signal_v1.py'
+      - 'contracts/v1/test_reactive_signal_v1.py'
+      - '.github/workflows/reactive-signal-contract.yml'
+  push:
+    branches: ['contract/reactive-signal-v1-20261017']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: python3 contracts/v1/verify_reactive_signal_v1.py
+      - run: python3 -m unittest discover -s contracts/v1 -p test_reactive_signal_v1.py

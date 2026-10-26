@@ -1,0 +1,32 @@
+{
+  "version": "nullary-enum-tag32-schema-v2",
+  "status": "host-only-not-guest-executable",
+  "encoding": "u32be-byte-length-prefixed-utf8-fields-and-positive-i32be-case-tags",
+  "qualified_enum_id": "local_unit.__root__.Foo",
+  "cases": [
+    {
+      "name": "A",
+      "tag": 5
+    },
+    {
+      "name": "B",
+      "tag": 17
+    },
+    {
+      "name": "C",
+      "tag": 31
+    }
+  ],
+  "layouts": [
+    {
+      "visibility": "private",
+      "schema_sha256": "1ac2d094a38482e8f21ada69339af2ad713192183980a1e5238065d1a61dfe83",
+      "canonical_bytes_hex": "000000216f7265732d6e756c6c6172792d656e756d2d74616733322d736368656d612d7632000000176c6f63616c5f756e69742e5f5f726f6f745f5f2e466f6f0000000770726976617465000000013300000001410000000500000001420000001100000001430000001f"
+    },
+    {
+      "visibility": "public",
+      "schema_sha256": "fb3c1db90ede565be35ba45be4ef9d7f47655e87b8ef7dcbb74136b8459dc4fd",
+      "canonical_bytes_hex": "000000216f7265732d6e756c6c6172792d656e756d2d74616733322d736368656d612d7632000000176c6f63616c5f756e69742e5f5f726f6f745f5f2e466f6f000000067075626c6963000000013300000001410000000500000001420000001100000001430000001f"
+    }
+  ]
+}

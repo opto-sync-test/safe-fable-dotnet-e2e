@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../value-boundary-rejections.json" Link="value-boundary-rejections.json"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../contracts/v2/cpu-gpu-task-unsupported-v2.json" Link="cpu-gpu-task-unsupported-v2.json"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../contracts/v1/source-i64/portable-i64.v1.json" Link="portable-i64.v1.json"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../contracts/scalar/v1/**/*"
+          Link="contracts/scalar/v1/%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="../../compiler/Ores.Net.Compiler.Core/Ores.Net.Compiler.Core.csproj" />
+    <ProjectReference Include="../../runtime/Ores.Net.Runtime/Ores.Net.Runtime.csproj" />
+    <!-- Independent metadata inspection runs only in the test process. -->
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+</Project>

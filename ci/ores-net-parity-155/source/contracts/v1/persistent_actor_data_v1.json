@@ -1,0 +1,208 @@
+{
+  "contract": "oreslang-persistent-actor-data-v1",
+  "version": 1,
+  "scope": "shared safety test vectors and conservative capability claims; not executable runtime parity",
+  "limits": {
+    "collision_bucket_max": 64,
+    "actor_message_graph_depth_max": 256,
+    "actor_message_graph_nodes_max": 100000
+  },
+  "value_domain": [
+    "string",
+    "boolean",
+    "character",
+    "byte",
+    "short",
+    "integer",
+    "long",
+    "float",
+    "double",
+    "bigint-exact",
+    "bigdecimal-exact",
+    "nested-persistent-map"
+  ],
+  "backend_support": {
+    "java": {
+      "hamt_runtime": "host-prototype",
+      "shared_identity": "host-prototype",
+      "pure_reducer_contract": "host-prototype",
+      "source_language_persistent_map": "unsupported",
+      "native_backed_hamt": "unsupported"
+    },
+    "llvm": {
+      "hamt_runtime": "unsupported",
+      "shared_identity": "unsupported",
+      "pure_reducer_contract": "unsupported",
+      "source_language_persistent_map": "unsupported",
+      "native_backed_hamt": "unsupported"
+    },
+    "net": {
+      "hamt_runtime": "unsupported",
+      "shared_identity": "unsupported",
+      "pure_reducer_contract": "unsupported",
+      "source_language_persistent_map": "unsupported",
+      "native_backed_hamt": "unsupported"
+    },
+    "wasm": {
+      "hamt_runtime": "unsupported",
+      "shared_identity": "unsupported",
+      "pure_reducer_contract": "unsupported",
+      "source_language_persistent_map": "unsupported",
+      "native_backed_hamt": "unsupported"
+    },
+    "forge": {
+      "hamt_runtime": "unsupported",
+      "shared_identity": "unsupported",
+      "pure_reducer_contract": "unsupported",
+      "source_language_persistent_map": "unsupported",
+      "native_backed_hamt": "unsupported"
+    }
+  },
+  "cases": [
+    {
+      "id": "hamt-path-copy",
+      "domain": "persistent-map",
+      "expect": "old-root-preserved"
+    },
+    {
+      "id": "hamt-delete",
+      "domain": "persistent-map",
+      "expect": "old-root-preserved"
+    },
+    {
+      "id": "hamt-aa-bb",
+      "domain": "hash-collision",
+      "expect": "two-distinct-keys"
+    },
+    {
+      "id": "hamt-high-hash-bits",
+      "domain": "hash-collision",
+      "expect": "consistent-lookup"
+    },
+    {
+      "id": "hamt-collision-over-64",
+      "domain": "hash-collision",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-nested-root",
+      "domain": "immutability",
+      "expect": "preserve-identity"
+    },
+    {
+      "id": "hamt-array-input",
+      "domain": "immutability",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-mutable-map-input",
+      "domain": "immutability",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-foreign-reference",
+      "domain": "immutability",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-numeric-subclass",
+      "domain": "immutability",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-null-value",
+      "domain": "immutability",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-clear-empty",
+      "domain": "immutability",
+      "expect": "reject-without-callback"
+    },
+    {
+      "id": "hamt-remove-missing",
+      "domain": "immutability",
+      "expect": "reject-without-callback"
+    },
+    {
+      "id": "hamt-remove-if-predicate",
+      "domain": "immutability",
+      "expect": "reject-without-callback"
+    },
+    {
+      "id": "hamt-shared-mailbox",
+      "domain": "actor-transport",
+      "expect": "preserve-identity"
+    },
+    {
+      "id": "hamt-private-mailbox",
+      "domain": "actor-transport",
+      "expect": "isolated-copy"
+    },
+    {
+      "id": "hamt-untrusted-mailbox",
+      "domain": "actor-transport",
+      "expect": "isolated-copy"
+    },
+    {
+      "id": "hamt-duplicate-send-quota",
+      "domain": "actor-quotas",
+      "expect": "charge-each-envelope"
+    },
+    {
+      "id": "hamt-drain-credit-release",
+      "domain": "actor-quotas",
+      "expect": "release-each-envelope"
+    },
+    {
+      "id": "hamt-depth-257",
+      "domain": "actor-quotas",
+      "expect": "reject"
+    },
+    {
+      "id": "hamt-node-budget",
+      "domain": "actor-quotas",
+      "expect": "reject"
+    },
+    {
+      "id": "pure-actor-single-reducer",
+      "domain": "pure-actor",
+      "expect": "require-one-exhaustive"
+    },
+    {
+      "id": "pure-actor-no-suspend",
+      "domain": "pure-actor",
+      "expect": "reject"
+    },
+    {
+      "id": "pure-actor-no-ambient-io",
+      "domain": "pure-actor",
+      "expect": "reject"
+    },
+    {
+      "id": "pure-actor-command-effects",
+      "domain": "pure-actor",
+      "expect": "bounded-command-effects"
+    },
+    {
+      "id": "persistent-source-syntax",
+      "domain": "source-language",
+      "expect": "unsupported"
+    },
+    {
+      "id": "persistent-vector",
+      "domain": "source-language",
+      "expect": "unsupported"
+    },
+    {
+      "id": "edn-wire-shortcut",
+      "domain": "interoperability",
+      "expect": "unsupported"
+    },
+    {
+      "id": "typed-map-mutating-adapter",
+      "domain": "interoperability",
+      "expect": "unsupported"
+    }
+  ]
+}

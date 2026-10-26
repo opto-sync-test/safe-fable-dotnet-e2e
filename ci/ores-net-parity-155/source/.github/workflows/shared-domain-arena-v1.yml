@@ -1,0 +1,121 @@
+name: Shared-domain arena v1 source-free parity
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/SHARED_DOMAIN_ARENAS_V1.md'
+      - 'contracts/v1/shared_domain_arena_v1.json'
+      - 'scripts/verify_shared_domain_arena_v1.py'
+      - 'scripts/test_shared_domain_arena_v1.py'
+      - '.github/workflows/shared-domain-arena-v1.yml'
+  push:
+    paths:
+      - 'contracts/v1/SHARED_DOMAIN_ARENAS_V1.md'
+      - 'contracts/v1/shared_domain_arena_v1.json'
+      - 'scripts/verify_shared_domain_arena_v1.py'
+      - 'scripts/test_shared_domain_arena_v1.py'
+      - '.github/workflows/shared-domain-arena-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-free-shared-domain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Assert exact source head and immutable shared-domain blobs
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse --verify HEAD)" = "$EXPECTED_HEAD"
+          test -n "$(git rev-parse 'HEAD^{tree}')"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          test "$(git hash-object contracts/v1/SHARED_DOMAIN_ARENAS_V1.md)" = "faed3d896ca66b1293b0e23b24b20b5038676a6c"
+          test "$(git hash-object contracts/v1/shared_domain_arena_v1.json)" = "84594bc0e3e905b0950ac8728997138d66c44b50"
+          test "$(git hash-object scripts/verify_shared_domain_arena_v1.py)" = "ca3f190d1ed89c0800371e226bcf909ce56621bd"
+          test "$(git hash-object scripts/test_shared_domain_arena_v1.py)" = "2f7152411d7ee3da51da76b7cd703ba90ab96fe8"
+      - name: Execute 49 adversarial shared-domain checks in three rounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -I -m py_compile scripts/verify_shared_domain_arena_v1.py scripts/test_shared_domain_arena_v1.py
+          python3 scripts/verify_shared_domain_arena_v1.py
+          python3 -I - <<'PY'
+          import json
+          import os
+          import sys
+          import unittest
+          from pathlib import Path
+          sys.path.insert(0, str(Path("scripts").resolve()))
+          from test_shared_domain_arena_v1 import SharedDomainArenaV1Test
+          counts = []
+          for round_id in (1, 2, 3):
+              suite = unittest.defaultTestLoader.loadTestsFromTestCase(SharedDomainArenaV1Test)
+              if suite.countTestCases() != 49:
+                  raise SystemExit("shared-domain test inventory differs from pinned 48")
+              result = unittest.TextTestRunner(verbosity=1).run(suite)
+              if (result.testsRun != 49 or not result.wasSuccessful()
+                      or result.skipped or result.expectedFailures or result.unexpectedSuccesses):
+                  raise SystemExit("shared-domain source-free tests failed or skipped")
+              counts.append(result.testsRun)
+              print(f"SHARED_DOMAIN_SOURCEFREE_ROUND_{round_id}_PASS=49", flush=True)
+          Path(os.environ["RUNNER_TEMP"], "shared-domain-rounds.json").write_text(
+              json.dumps({"round_counts": counts, "executed_total": sum(counts)}, sort_keys=True))
+          PY
+      - name: Emit bounded source-free shared-domain receipt
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_REPO_ID: ${{ github.repository_id }}
+        run: |
+          set -euo pipefail
+          python3 -I - <<'PY'
+          import json
+          import os
+          import pathlib
+          import subprocess
+          def git(*args):
+              return subprocess.check_output(("git", *args), text=True).strip()
+          paths = (
+              "contracts/v1/SHARED_DOMAIN_ARENAS_V1.md",
+              "contracts/v1/shared_domain_arena_v1.json",
+              "scripts/verify_shared_domain_arena_v1.py",
+              "scripts/test_shared_domain_arena_v1.py")
+          blobs = {p: git("hash-object", p) for p in paths}
+          counts = json.loads((pathlib.Path(os.environ["RUNNER_TEMP"]) /
+                               "shared-domain-rounds.json").read_text())
+          if git("rev-parse", "HEAD") != os.environ["EXPECTED_HEAD"]:
+              raise SystemExit("receipt HEAD mismatch")
+          if counts != {"round_counts": [49, 49, 49], "executed_total": 147}:
+              raise SystemExit("receipt test inventory mismatch")
+          receipt = {
+              "schema": "oreslang.shared_domain_arena_sourcefree_v1",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "repository_id": int(os.environ["EXPECTED_REPO_ID"]),
+              "head_sha": git("rev-parse", "HEAD"),
+              "tree_sha": git("rev-parse", "HEAD^{tree}"),
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "git_blobs": blobs,
+              "round_counts": counts["round_counts"],
+              "executed_total": 147,
+              "source_free_only": True,
+              "native_backend_certified": False,
+              "guest_runtime_certified": False,
+              "rt_share_certified": False,
+              "critical_lowering_certified": False}
+          (pathlib.Path(os.environ["RUNNER_TEMP"]) / "shared-domain-arena-v1.json").write_text(
+              json.dumps(receipt, sort_keys=True, indent=2) + "\n")
+          PY
+      - name: Upload source-free shared-domain receipt only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: shared-domain-arena-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/shared-domain-arena-v1.json
+          if-no-files-found: error
+          retention-days: 7

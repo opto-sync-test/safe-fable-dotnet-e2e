@@ -1,0 +1,481 @@
+{
+  "version": "nominal-method-slot-abi-v1",
+  "evidence": "reference-only-not-backend-execution",
+  "source": "Java NominalMethodSlots.Slot.linkSymbol and LLVM NominalMethodSlotPolicy::linkSymbol; trusted factory accepts String alias, raw ABI signature rejects noncanonical String",
+  "backend_expectations": {
+    "java": "staged-static-plus-arity-binding-no-nominal-runtime",
+    "llvm": "staged-native-policy-no-guest-nominal-runtime",
+    "net": "reject-unimplemented",
+    "wasm": "reject-unimplemented",
+    "forge": "reject-unimplemented"
+  },
+  "accept": [
+    {
+      "id": "color",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "symbol": "$methodoverload$v1$11_726f6f742e5069636b6572$8_494e5354414e4345$6_63686f6f7365$1$4_454e554d$11_726f6f743a3a436f6c6f72$"
+    },
+    {
+      "id": "mode",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Mode"
+        }
+      ],
+      "symbol": "$methodoverload$v1$11_726f6f742e5069636b6572$8_494e5354414e4345$6_63686f6f7365$1$4_454e554d$10_726f6f743a3a4d6f6465$"
+    },
+    {
+      "id": "static-color",
+      "owner": "root.Picker",
+      "domain": "STATIC",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "symbol": "$methodoverload$v1$11_726f6f742e5069636b6572$6_535441544943$6_63686f6f7365$1$4_454e554d$11_726f6f743a3a436f6c6f72$"
+    },
+    {
+      "id": "other-owner",
+      "owner": "root.Other",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "symbol": "$methodoverload$v1$10_726f6f742e4f74686572$8_494e5354414e4345$6_63686f6f7365$1$4_454e554d$11_726f6f743a3a436f6c6f72$"
+    },
+    {
+      "id": "unicode-owner",
+      "owner": "m\u00f3dulo.Picker",
+      "domain": "INSTANCE",
+      "name": "process",
+      "positions": [
+        {
+          "kind": "PRIMITIVE",
+          "id": "int"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "symbol": "$methodoverload$v1$14_6dc3b364756c6f2e5069636b6572$8_494e5354414e4345$7_70726f63657373$2$9_5052494d4954495645$3_696e74$4_454e554d$11_726f6f743a3a436f6c6f72$"
+    }
+  ],
+  "reject": [
+    {
+      "id": "invalid-domain",
+      "owner": "root.Picker",
+      "domain": "DYNAMIC",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "id": "owner-control",
+      "owner": "root\nPicker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "id": "bad-surrogate",
+      "owner": "root\ud800Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "id": "oversize-name",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "id": "unqualified-enum",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "Color"
+        }
+      ]
+    },
+    {
+      "id": "primitive-alias",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "PRIMITIVE",
+          "id": "String"
+        }
+      ]
+    },
+    {
+      "id": "forged-kind",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "RUNTIME",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "id": "arity-limit",
+      "owner": "root.Picker",
+      "domain": "INSTANCE",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ]
+    },
+    {
+      "owner": "   ",
+      "domain": "DYNAMIC",
+      "name": "choose",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "id": "blank-owner"
+    },
+    {
+      "owner": "root.Picker",
+      "domain": "DYNAMIC",
+      "name": "   ",
+      "positions": [
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "id": "blank-name"
+    }
+  ],
+  "normalization": [
+    {
+      "id": "factory-String-to-string",
+      "layer": "trusted-compiler-signature-factory",
+      "owner": "m\u00f3dulo.Picker",
+      "domain": "INSTANCE",
+      "name": "process",
+      "positions": [
+        {
+          "kind": "PRIMITIVE",
+          "id": "String"
+        },
+        {
+          "kind": "ENUM",
+          "id": "root::Color"
+        }
+      ],
+      "symbol": "$methodoverload$v1$14_6dc3b364756c6f2e5069636b6572$8_494e5354414e4345$7_70726f63657373$2$9_5052494d4954495645$6_737472696e67$4_454e554d$11_726f6f743a3a436f6c6f72$"
+    }
+  ]
+}

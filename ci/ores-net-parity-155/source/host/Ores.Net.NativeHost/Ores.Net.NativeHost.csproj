@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>oreslang-app</AssemblyName>
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../runtime/Ores.Net.Runtime/Ores.Net.Runtime.csproj" />
+    <Reference Include="OresGenerated">
+      <HintPath>$(GeneratedAssembly)</HintPath>
+      <!-- Native AOT's ILCompiler must resolve the physical assembly at link
+           time. Private=false excludes it from the publish dependency closure,
+           producing a native executable that throws FileNotFoundException.
+           Keep it in the build closure; release validation independently
+           rejects managed DLL sidecars in the final native output. -->
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="ValidateGeneratedAssembly" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(GeneratedAssembly)' == ''" Text="Pass -p:GeneratedAssembly=&lt;absolute path to OresGenerated.dll&gt;." />
+    <Error Condition="'$(GeneratedAssembly)' != '' and !Exists('$(GeneratedAssembly)')" Text="Generated CIL assembly is missing: $(GeneratedAssembly)" />
+  </Target>
+  <Import Project="../../build/StrictNativeAot.targets" />
+</Project>

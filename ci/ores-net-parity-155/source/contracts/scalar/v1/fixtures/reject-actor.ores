@@ -1,0 +1,2 @@
+define actor Worker as { pub fnc on_message(int n): int { return n; } }
+pub fnc main(): int { const worker = spawn Worker(); stop worker; return 43; }

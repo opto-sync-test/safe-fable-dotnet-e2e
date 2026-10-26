@@ -1,0 +1,206 @@
+{
+  "contract": "oreslang-shared-domain-arena-v1",
+  "version": 1,
+  "status": "source-free-contract-only",
+  "scope": "shared-domain ownership, typed authority, critical access and quiescent retirement; no guest/runtime parity certification",
+  "lifecycle_order": [
+    "create-domain",
+    "issue-control",
+    "grant-membership",
+    "critical-access",
+    "logical-retire",
+    "authority-revocation",
+    "quiescence",
+    "byte-scrub",
+    "physical-reclamation"
+  ],
+  "source_semantics": {
+    "critical_read": "lexical-nonsuspending-read-lease",
+    "critical_write": "lexical-nonsuspending-exclusive-lease",
+    "guest_callback_while_locked": "forbidden",
+    "busy_policy": "fail-fast-scheduler-retry",
+    "rt_share": "unsupported-until-guest-lowering-and-source-conformance"
+  },
+  "backend_support": {
+    "java": {
+      "host_shared_domain": "unsupported",
+      "guest_critical_lowering": "unsupported",
+      "rt_share": "unsupported",
+      "exact_head_runtime_evidence": "pending"
+    },
+    "llvm": {
+      "host_shared_domain": "candidate-host-prototype",
+      "guest_critical_lowering": "unsupported",
+      "rt_share": "unsupported",
+      "exact_head_runtime_evidence": "pending"
+    },
+    "net": {
+      "host_shared_domain": "unsupported",
+      "guest_critical_lowering": "unsupported",
+      "rt_share": "unsupported",
+      "exact_head_runtime_evidence": "pending"
+    },
+    "wasm": {
+      "host_shared_domain": "unsupported",
+      "guest_critical_lowering": "unsupported",
+      "rt_share": "unsupported",
+      "exact_head_runtime_evidence": "pending"
+    },
+    "forge": {
+      "host_shared_domain": "unsupported",
+      "guest_critical_lowering": "unsupported",
+      "rt_share": "unsupported",
+      "exact_head_runtime_evidence": "pending"
+    }
+  },
+  "cases": [
+    {
+      "id": "domain-control-opaque",
+      "expect": "deny-fabrication"
+    },
+    {
+      "id": "control-one-shot",
+      "expect": "required"
+    },
+    {
+      "id": "foreign-control-denied",
+      "expect": "deny"
+    },
+    {
+      "id": "stale-control-same-address-reuse-denied",
+      "expect": "deny-stale"
+    },
+    {
+      "id": "actor-ref-not-domain-capability",
+      "expect": "deny"
+    },
+    {
+      "id": "grant-binds-domain",
+      "expect": "required"
+    },
+    {
+      "id": "grant-binds-actor",
+      "expect": "required"
+    },
+    {
+      "id": "grant-binds-incarnation",
+      "expect": "required"
+    },
+    {
+      "id": "read-permit-allows-read",
+      "expect": "allow"
+    },
+    {
+      "id": "read-permit-denies-write",
+      "expect": "deny"
+    },
+    {
+      "id": "write-permit-allows-read-write",
+      "expect": "allow"
+    },
+    {
+      "id": "missing-permit-denied",
+      "expect": "deny"
+    },
+    {
+      "id": "critical-read-nonsuspending",
+      "expect": "required"
+    },
+    {
+      "id": "critical-write-nonsuspending",
+      "expect": "required"
+    },
+    {
+      "id": "no-guest-callback-under-lock",
+      "expect": "required"
+    },
+    {
+      "id": "critical-admission-nonparking",
+      "expect": "required"
+    },
+    {
+      "id": "writer-conflict-is-busy",
+      "expect": "retryable-busy"
+    },
+    {
+      "id": "reader-conflict-with-writer-is-busy",
+      "expect": "retryable-busy"
+    },
+    {
+      "id": "revocation-monotonic",
+      "expect": "required"
+    },
+    {
+      "id": "stale-grant-denied",
+      "expect": "deny-stale"
+    },
+    {
+      "id": "handle-domain-fence",
+      "expect": "deny-foreign"
+    },
+    {
+      "id": "handle-generation-fence",
+      "expect": "deny-stale"
+    },
+    {
+      "id": "generation-never-wraps",
+      "expect": "fail-closed"
+    },
+    {
+      "id": "lifetime-pin-no-byte-authority",
+      "expect": "required"
+    },
+    {
+      "id": "lifetime-pin-off-carrier-release",
+      "expect": "allow-release-only"
+    },
+    {
+      "id": "lifetime-pin-quota-bounded",
+      "expect": "fail-closed"
+    },
+    {
+      "id": "retire-seals-new-authority",
+      "expect": "required"
+    },
+    {
+      "id": "active-lease-delays-reclaim",
+      "expect": "defer"
+    },
+    {
+      "id": "lifetime-pin-delays-reclaim",
+      "expect": "defer"
+    },
+    {
+      "id": "failed-reclaim-remains-sealed",
+      "expect": "required"
+    },
+    {
+      "id": "scrub-before-capacity-reuse",
+      "expect": "required"
+    },
+    {
+      "id": "retirement-idempotent",
+      "expect": "required"
+    },
+    {
+      "id": "rt-share-unsupported-until-guest-lowering",
+      "expect": "unsupported"
+    },
+    {
+      "id": "scheduler-derived-actor-identity-required",
+      "expect": "required"
+    },
+    {
+      "id": "guest-critical-lowering-needs-proof",
+      "expect": "pending-evidence"
+    },
+    {
+      "id": "tenant-aggregate-quota-required",
+      "expect": "required"
+    },
+    {
+      "id": "exact-head-runtime-evidence-required",
+      "expect": "pending-evidence"
+    }
+  ]
+}

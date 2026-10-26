@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <!-- The production Native AOT compiler uses System.Reflection.Metadata only.
+       Mono.Cecil remains a verification-only dependency, not a published runtime. -->
+</Project>

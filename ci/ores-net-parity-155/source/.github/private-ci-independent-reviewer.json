@@ -1,0 +1,10 @@
+{
+  "schema": 2,
+  "enabled": false,
+  "minimumPermission": "write",
+  "disallowedReviewerIds": [
+    11139560,
+    2148448
+  ],
+  "reviewer": null
+}

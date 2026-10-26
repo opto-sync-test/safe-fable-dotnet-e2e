@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "checks": [
+    {
+      "context": "private-ci-policy",
+      "appId": 15368
+    }
+  ]
+}

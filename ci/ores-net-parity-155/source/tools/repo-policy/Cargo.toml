@@ -1,0 +1,17 @@
+[package]
+name = "oreslang-js-repo-tools"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "verify-integration-manifest"
+path = "src/main.rs"
+
+[[bin]]
+name = "no-python-check"
+path = "src/no_python.rs"
+
+[dependencies]
+serde = "1.0"
+serde_json = "1.0"

@@ -1,0 +1,143 @@
+{
+  "contract": "oreslang.dop.cpu-regions",
+  "version": 1,
+  "scope": "Backend-neutral expected behavior for owned scalar f32 host regions; not evidence of implementation or GPU support",
+  "shape": {
+    "scalar_bytes": 4,
+    "alignment": 16,
+    "fields": 3,
+    "rows": 7,
+    "layouts": [
+      "AoS",
+      "SoA",
+      "AoSoA"
+    ],
+    "aosoa_lanes": 4
+  },
+  "effects": [
+    "READ",
+    "WRITE",
+    "DISCARD",
+    "REDUCE",
+    "ATOMIC"
+  ],
+  "requirements": [
+    "Explicit per-allocation identity; ownership transfer preserves identity",
+    "Borrowed buffers cannot be closed or moved",
+    "Region slices are half-open row intervals",
+    "Admission failures cannot partially modify destination",
+    "No GPU dispatch or fallback may be inferred from this CPU contract"
+  ],
+  "cases": [
+    {
+      "id": "geometry/aos-offset",
+      "domain": "layout",
+      "expected": "valid"
+    },
+    {
+      "id": "geometry/soa-offset",
+      "domain": "layout",
+      "expected": "valid"
+    },
+    {
+      "id": "geometry/aosoa-tail-tile",
+      "domain": "layout",
+      "expected": "valid"
+    },
+    {
+      "id": "geometry/checked-overflow",
+      "domain": "layout",
+      "expected": "reject"
+    },
+    {
+      "id": "geometry/zero-rows",
+      "domain": "layout",
+      "expected": "valid"
+    },
+    {
+      "id": "ownership/stable-id-through-take",
+      "domain": "ownership",
+      "expected": "valid"
+    },
+    {
+      "id": "ownership/stale-owner-reject",
+      "domain": "ownership",
+      "expected": "reject"
+    },
+    {
+      "id": "ownership/close-idempotent",
+      "domain": "ownership",
+      "expected": "valid"
+    },
+    {
+      "id": "ownership/close-with-reader",
+      "domain": "ownership",
+      "expected": "reject"
+    },
+    {
+      "id": "ownership/close-with-writer",
+      "domain": "ownership",
+      "expected": "reject"
+    },
+    {
+      "id": "ownership/retired-region",
+      "domain": "ownership",
+      "expected": "reject"
+    },
+    {
+      "id": "loans/exclusive-writer-vs-reader",
+      "domain": "loans",
+      "expected": "reject"
+    },
+    {
+      "id": "loans/readers-coexist",
+      "domain": "loans",
+      "expected": "valid"
+    },
+    {
+      "id": "execute/half-open-write-footprint",
+      "domain": "execute",
+      "expected": "valid"
+    },
+    {
+      "id": "execute/three-scalar-ops",
+      "domain": "execute",
+      "expected": "valid"
+    },
+    {
+      "id": "execute/alias-input-output",
+      "domain": "execute",
+      "expected": "reject"
+    },
+    {
+      "id": "execute/invalid-effect",
+      "domain": "execute",
+      "expected": "reject"
+    },
+    {
+      "id": "execute/mismatched-layout",
+      "domain": "execute",
+      "expected": "reject"
+    },
+    {
+      "id": "execute/no-partial-write-on-admission-failure",
+      "domain": "execute",
+      "expected": "valid"
+    },
+    {
+      "id": "scheduler/overlap-serialization",
+      "domain": "scheduler",
+      "expected": "valid"
+    },
+    {
+      "id": "scheduler/disjoint-read-independence",
+      "domain": "scheduler",
+      "expected": "valid"
+    },
+    {
+      "id": "gpu/no-implicit-cpu-fallback",
+      "domain": "gpu-boundary",
+      "expected": "reject"
+    }
+  ]
+}

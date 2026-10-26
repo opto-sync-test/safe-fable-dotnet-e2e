@@ -1,0 +1,31 @@
+{
+  "contract": "oreslang.reactive-signal.v1",
+  "backend": "dotnet",
+  "consumer_signal": "Result<Option<T>, Option<E>>",
+  "producer_frame": "Result<Option<T>, E>",
+  "consumer_variants": {
+    "NEXT": "Ok(Some(T))",
+    "COMPLETE": "Ok(None)",
+    "CANCELLED": "Err(None)",
+    "ERROR": "Err(Some(E))"
+  },
+  "semantics": {
+    "cancellation_is_consumer_control": true,
+    "nested_option_is_data": true,
+    "nested_result_err_is_data": true,
+    "borrowed_producer_not_cancelled_by_adapter": true,
+    "pending_writes_must_be_bounded": true
+  },
+  "features": {
+    "canonical_consumer_signal": "unsupported",
+    "producer_frame": "unsupported",
+    "channel_source": "unsupported",
+    "future_source": "unsupported",
+    "mixed_channel_future_select": "unsupported",
+    "observable": "unsupported",
+    "credit_pipe": "unsupported"
+  },
+  "unsupported_policy": "reject_before_lowering",
+  "executed_evidence": {},
+  "note": "Bootstrap arithmetic/CIL backend has no source reactive lowering; bounded byte mailbox prototype does not count."
+}

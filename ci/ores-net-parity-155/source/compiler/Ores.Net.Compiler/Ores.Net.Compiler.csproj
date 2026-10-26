@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>oresnet</AssemblyName>
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ores.Net.Compiler.Core/Ores.Net.Compiler.Core.csproj" />
+  </ItemGroup>
+  <Import Project="../../build/StrictNativeAot.targets" />
+</Project>

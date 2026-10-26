@@ -1,0 +1,44 @@
+name: Persistent actor data v1 policy conformance
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/persistent_actor_data_v1.json'
+      - 'scripts/verify_persistent_actor_data_contract.py'
+      - 'scripts/test_persistent_actor_data_contract.py'
+      - '.github/workflows/persistent-actor-data-contract.yml'
+  push:
+    paths:
+      - 'contracts/v1/persistent_actor_data_v1.json'
+      - 'scripts/verify_persistent_actor_data_contract.py'
+      - 'scripts/test_persistent_actor_data_contract.py'
+      - '.github/workflows/persistent-actor-data-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  policy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify exact source head
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse --verify HEAD)" = "$EXPECTED_SHA"
+          test -z "$(git status --porcelain --untracked-files=all)"
+      - name: Pin identical five-backend contract source blobs
+        shell: bash
+        run: |
+          test "$(git hash-object contracts/v1/persistent_actor_data_v1.json)" = "83a40f637ab77437108d02fedc8cde997f753928"
+          test "$(git hash-object scripts/verify_persistent_actor_data_contract.py)" = "64de299cfa548cbea3ab15a37f7a7638631fe73e"
+          test "$(git hash-object scripts/test_persistent_actor_data_contract.py)" = "ff744f14de6d0da46f8bdc6eb1b04208480158b6"
+      - name: Reject capability and fixture drift
+        run: python3 scripts/verify_persistent_actor_data_contract.py
+      - name: Execute negative policy mutation suite
+        run: python3 scripts/test_persistent_actor_data_contract.py -v

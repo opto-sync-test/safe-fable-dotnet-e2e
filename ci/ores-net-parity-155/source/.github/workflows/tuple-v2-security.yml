@@ -1,0 +1,27 @@
+name: Tuple v2 source-free security gate
+on:
+  pull_request:
+    paths:
+      - 'contracts/structural/v2/tuple-security.v1.json'
+      - 'scripts/verify_tuple_v2_security.py'
+      - 'scripts/test_tuple_v2_security.py'
+      - '.github/workflows/tuple-v2-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tuple-v2-policy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify tuple-v2 contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -S scripts/verify_tuple_v2_security.py
+          python3 -S scripts/test_tuple_v2_security.py

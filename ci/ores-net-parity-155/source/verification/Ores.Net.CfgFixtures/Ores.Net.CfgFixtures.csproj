@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../compiler/Ores.Net.Compiler.Core/Ores.Net.Compiler.Core.csproj" />
+  </ItemGroup>
+</Project>

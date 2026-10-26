@@ -1,0 +1,77 @@
+{
+  "schema": "oreslang.actor_arena_quiescence_evidence.v2",
+  "revision": 2,
+  "purpose": "Canonical source-free gating: not a runtime certificate",
+  "source_free_policy_only": true,
+  "never_export_private_source_to_unapproved_org": true,
+  "required_barriers": [
+    "single-flight-per-actor",
+    "bounded-mailbox-and-memory-credit",
+    "authenticated-data-control-separation",
+    "logical-revocation-before-reclaim",
+    "physical-turn-quiescence",
+    "read-loan-quiescence",
+    "external-continuation-lease-quiescence",
+    "shared-domain-membership-quiescence",
+    "routed-mail-publication-and-retirement",
+    "stop-cancel-terminal-drain",
+    "retryable-partial-physical-cleanup",
+    "generation-incarnation-aba-fence",
+    "zeroization-before-capacity-reuse",
+    "cross-carrier-release-no-guest-dereference",
+    "failure-reason-observability",
+    "exact-head-native-evidence"
+  ],
+  "mandatory_native_evidence": {
+    "exact_pr_head_and_git_tree": true,
+    "issuer_bound_required_check": true,
+    "authorized_source_local_runner": true,
+    "minimum_executed_job_steps": 1,
+    "adversarial_actor_lifecycle_fixtures": true,
+    "independent_code_review": true,
+    "pass_failure_artifact_manifest": true,
+    "zero_step_result": "NOT_EXECUTED"
+  },
+  "backends": {
+    "java": {
+      "host_substrate": "PRESENT_UNCERTIFIED",
+      "source_actor_execution": "NOT_VERIFIED",
+      "native_execution": "NOT_VERIFIED",
+      "native_aot": "NOT_VERIFIED",
+      "source_local_run": "NOT_EXECUTED",
+      "live_streams_and_callbacks": "NOT_VERIFIED"
+    },
+    "llvm": {
+      "host_substrate": "PRESENT_UNCERTIFIED",
+      "source_actor_execution": "NOT_VERIFIED",
+      "native_execution": "NOT_VERIFIED",
+      "native_aot": "NOT_VERIFIED",
+      "source_local_run": "NOT_EXECUTED",
+      "live_streams_and_callbacks": "NOT_VERIFIED"
+    },
+    "net": {
+      "host_substrate": "PRESENT_UNCERTIFIED",
+      "source_actor_execution": "NOT_VERIFIED",
+      "native_execution": "NOT_VERIFIED",
+      "native_aot": "NOT_VERIFIED",
+      "source_local_run": "NOT_EXECUTED",
+      "live_streams_and_callbacks": "NOT_VERIFIED"
+    },
+    "wasm": {
+      "host_substrate": "PRESENT_UNCERTIFIED",
+      "source_actor_execution": "NOT_VERIFIED",
+      "native_execution": "NOT_VERIFIED",
+      "native_aot": "NOT_VERIFIED",
+      "source_local_run": "NOT_EXECUTED",
+      "live_streams_and_callbacks": "NOT_VERIFIED"
+    },
+    "forge": {
+      "host_substrate": "PRESENT_UNCERTIFIED",
+      "source_actor_execution": "NOT_VERIFIED",
+      "native_execution": "NOT_VERIFIED",
+      "native_aot": "NOT_VERIFIED",
+      "source_local_run": "NOT_EXECUTED",
+      "live_streams_and_callbacks": "NOT_VERIFIED"
+    }
+  }
+}

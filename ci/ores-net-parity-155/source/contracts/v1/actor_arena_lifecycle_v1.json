@@ -1,0 +1,83 @@
+{
+  "backend_support": {
+    "forge": {
+      "candidate_stage": "candidate-host-only-native-arena",
+      "continuation_ffi_io_wiring": "unverified",
+      "exact_head_ci_certified": false,
+      "general_guest_value_lowering": "unsupported",
+      "lifetime_pin_model": "external-lifetime-lease-prototype",
+      "native_aot_certified": false,
+      "shared_domain_arena": "unsupported",
+      "zero_host_gc_certified": false
+    },
+    "java": {
+      "candidate_stage": "candidate-host-runtime-ffm",
+      "continuation_ffi_io_wiring": "unverified",
+      "exact_head_ci_certified": false,
+      "general_guest_value_lowering": "unsupported",
+      "lifetime_pin_model": "persistent-region-loan-prototype",
+      "native_aot_certified": false,
+      "shared_domain_arena": "unsupported",
+      "zero_host_gc_certified": false
+    },
+    "llvm": {
+      "candidate_stage": "candidate-compiled-i64-substrate",
+      "continuation_ffi_io_wiring": "unverified",
+      "exact_head_ci_certified": false,
+      "general_guest_value_lowering": "unsupported",
+      "lifetime_pin_model": "native-loan-accounting-prototype",
+      "native_aot_certified": false,
+      "shared_domain_arena": "host-prototype-unverified",
+      "zero_host_gc_certified": false
+    },
+    "net": {
+      "candidate_stage": "candidate-host-only-unmanaged",
+      "continuation_ffi_io_wiring": "unverified",
+      "exact_head_ci_certified": false,
+      "general_guest_value_lowering": "unsupported",
+      "lifetime_pin_model": "external-lifetime-lease-prototype",
+      "native_aot_certified": false,
+      "shared_domain_arena": "unsupported",
+      "zero_host_gc_certified": false
+    },
+    "wasm": {
+      "candidate_stage": "candidate-host-only-page-pool",
+      "continuation_ffi_io_wiring": "unverified",
+      "exact_head_ci_certified": false,
+      "general_guest_value_lowering": "unsupported",
+      "lifetime_pin_model": "external-lifetime-lease-prototype",
+      "native_aot_certified": false,
+      "shared_domain_arena": "unsupported",
+      "zero_host_gc_certified": false
+    }
+  },
+  "contract": "oreslang-shared-actor-arenas-v1",
+  "required_invariants": [
+    "actor-private-by-default",
+    "actorref-never-grants-arena-access",
+    "persistent-outlives-turn-not-retirement",
+    "scratch-invalid-after-every-turn-exit",
+    "stale-generation-and-wrong-incarnation-rejected",
+    "no-guest-raw-pointer-or-memorysegment-exposure",
+    "logical-retirement-revokes-new-authority-before-quiescence",
+    "external-lifetime-pins-grant-no-memory-access",
+    "continuation-borrow-ffi-io-owners-must-register-lifetime-pins",
+    "physical-reclaim-waits-for-live-turns-borrows-and-external-pins",
+    "late-callbacks-cannot-resurrect-retired-authority",
+    "external-pin-release-is-idempotent",
+    "shared-domain-reclaim-waits-for-members-and-leases",
+    "reused-capacity-is-zeroized-before-admission",
+    "retirement-is-monotonic-and-idempotent",
+    "unsupported-shared-domain-or-general-lowering-fails-closed",
+    "quota-charge-precedes-allocation-and-failed-admission-is-accounting-neutral",
+    "rejected-construction-does-not-consume-capability-identity",
+    "nontrivial-values-drop-exactly-once-before-bulk-reclaim",
+    "identity-and-generation-counters-never-wrap-into-live-authority",
+    "double-release-and-retire-races-cannot-underflow-accounting",
+    "cross-actor-capability-transfer-never-grants-private-arena-authority",
+    "snapshot-restore-cannot-revive-retired-or-stale-authority",
+    "reclaim-failure-keeps-logical-retirement-and-dirty-capacity-unpublished"
+  ],
+  "scope": "source-free lifecycle/capability declarations; not guest runtime, compiler, AOT, callback-wiring, or zero-GC certification",
+  "version": 1
+}

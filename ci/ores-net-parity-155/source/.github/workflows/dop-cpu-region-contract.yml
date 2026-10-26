@@ -1,0 +1,21 @@
+name: DOP CPU region contract
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/dop-cpu-regions/**'
+      - 'scripts/verify_dop_cpu_regions.py'
+      - '.github/workflows/dop-cpu-region-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate shared CPU region contract and negative reports
+        run: python3 scripts/verify_dop_cpu_regions.py --self-test

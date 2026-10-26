@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "status": "reference-only-not-compiled-execution",
+  "scope": "portable signed i64 programs whose every intermediate value is representable as i64; excludes overflow and division pending policy alignment",
+  "cases": [
+    {
+      "id": "precedence",
+      "expression": "2+3*4",
+      "expected": "14"
+    },
+    {
+      "id": "grouping",
+      "expression": "(2+3)*4",
+      "expected": "20"
+    },
+    {
+      "id": "signed-multiplication",
+      "expression": "(8-3)*5+2",
+      "expected": "27"
+    },
+    {
+      "id": "subtraction",
+      "expression": "100-(3+2)-19",
+      "expected": "76"
+    },
+    {
+      "id": "negative-result",
+      "expression": "3*4-2*5-7",
+      "expected": "-5"
+    },
+    {
+      "id": "max-minus-one",
+      "expression": "9223372036854775807-1",
+      "expected": "9223372036854775806"
+    },
+    {
+      "id": "signed-minimum",
+      "expression": "-9223372036854775808",
+      "expected": "-9223372036854775808"
+    }
+  ]
+}

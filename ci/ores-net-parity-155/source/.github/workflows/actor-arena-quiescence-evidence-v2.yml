@@ -1,0 +1,28 @@
+name: Actor arena quiescence evidence v2 (source-free)
+on:
+  pull_request:
+    paths:
+      - 'contracts/v1/actor_arena_quiescence_matrix_v2.json'
+      - 'contracts/v1/ACTOR_ARENA_QUIESCENCE_EVIDENCE_V2.md'
+      - 'scripts/verify_actor_arena_quiescence_matrix_v2.py'
+      - 'scripts/test_actor_arena_quiescence_matrix_v2.py'
+      - '.github/workflows/actor-arena-quiescence-evidence-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-free-matrix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Check quiescence policy and reject weakened claims
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/verify_actor_arena_quiescence_matrix_v2.py
+          python3 scripts/test_actor_arena_quiescence_matrix_v2.py

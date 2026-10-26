@@ -1,0 +1,19 @@
+# Private CI export authorization policy.
+# Protect all workflow changes from unreviewed same-name GitHub Actions check spoofing.
+# Keep the directory wildcard directly before the final exact policy rules.
+/.github/workflows/ @ORESoftware
+/.github/CODEOWNERS @ORESoftware
+/.github/private-ci-approved-repositories.txt @ORESoftware
+/.github/private-ci-approved-source-snapshots.txt @ORESoftware
+/.github/private-ci-independent-reviewer.json @ORESoftware
+/.github/private-ci-required-checks.json @ORESoftware
+/.github/workflows/private-ci-policy.yml @ORESoftware
+
+# Native AOT compiler/runtime and verification trust boundaries.
+/compiler/ @ORESoftware
+/runtime/ @ORESoftware
+/host/ @ORESoftware
+/verification/ @ORESoftware
+/contracts/ @ORESoftware
+/tools/ @ORESoftware
+/scripts/ @ORESoftware

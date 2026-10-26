@@ -1,0 +1,33 @@
+name: Enum case overload static ABI v2
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/v2/**'
+      - '.github/workflows/enum-case-contract-v2.yml'
+  pull_request:
+    paths:
+      - 'contracts/v2/**'
+      - '.github/workflows/enum-case-contract-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Require exact source commit
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test -z "$(git status --porcelain)"
+      - name: Verify source-free overlap model and EOS2 golden bytes
+        run: |
+          python3 -B -m unittest discover -s contracts/v2 -p 'test_enum_case_*.py' -v
+          python3 -B -O -m unittest discover -s contracts/v2 -p 'test_enum_case_*.py' -v

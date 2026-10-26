@@ -1,0 +1,29 @@
+name: Sendable Serializable static contract
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  serde-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9a
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify exact reviewed revision
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          git rev-parse HEAD
+          git rev-parse 'HEAD^{tree}'
+      - run: cargo test --manifest-path tools/serde-contract-gate/Cargo.toml
+      - run: cargo run --manifest-path tools/serde-contract-gate/Cargo.toml -- --root .

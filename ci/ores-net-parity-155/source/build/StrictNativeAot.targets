@@ -1,0 +1,14 @@
+<Project>
+  <!-- Imported only by distributable compiler and application projects.
+       Managed developer tests remain allowed, but publish is ALWAYS strict AOT. -->
+  <Target Name="VerifyStrictNativeAotPublish" BeforeTargets="Publish">
+    <Error Condition="'$(PublishAot)' != 'true'"
+           Text="Oreslang release rejects managed/JIT publish. Set PublishAot=true." />
+    <Error Condition="'$(SelfContained)' != 'true'"
+           Text="Oreslang release requires a self-contained Native AOT binary." />
+    <Error Condition="'$(TargetFramework)' != 'net10.0'"
+           Text="Oreslang release requires the pinned net10.0 target." />
+    <Error Condition="'$(RuntimeIdentifier)' != 'win-x64' and '$(RuntimeIdentifier)' != 'win-arm64' and '$(RuntimeIdentifier)' != 'linux-x64'"
+           Text="Oreslang Native AOT requires an explicit supported RID: win-x64, win-arm64 or linux-x64 (diagnostics)." />
+  </Target>
+</Project>
