@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "cases": [
+    {
+      "id": "scalar.literal-42",
+      "file": "fixtures/literal-42.ores",
+      "kind": "accept",
+      "value": "42"
+    },
+    {
+      "id": "scalar.precedence",
+      "file": "fixtures/precedence.ores",
+      "kind": "accept",
+      "value": "28"
+    },
+    {
+      "id": "scalar.unary",
+      "file": "fixtures/unary.ores",
+      "kind": "accept",
+      "value": "-21"
+    },
+    {
+      "id": "scalar.i64-min",
+      "file": "fixtures/i64-min.ores",
+      "kind": "accept",
+      "value": "-9223372036854775808"
+    },
+    {
+      "id": "scalar.i64-max",
+      "file": "fixtures/i64-max.ores",
+      "kind": "accept",
+      "value": "9223372036854775807"
+    },
+    {
+      "id": "scalar.i64-max-minus-one",
+      "file": "fixtures/i64-max-minus-one.ores",
+      "kind": "accept",
+      "value": "9223372036854775806"
+    },
+    {
+      "id": "reject.unknown",
+      "file": "fixtures/reject-unknown.ores",
+      "kind": "reject"
+    },
+    {
+      "id": "reject.division",
+      "file": "fixtures/reject-division.ores",
+      "kind": "reject"
+    },
+    {
+      "id": "reject.actor",
+      "file": "fixtures/reject-actor.ores",
+      "kind": "reject"
+    },
+    {
+      "id": "reject.async",
+      "file": "fixtures/reject-async.ores",
+      "kind": "reject"
+    },
+    {
+      "id": "reject.structural",
+      "file": "fixtures/reject-structural.ores",
+      "kind": "reject"
+    }
+  ]
+}

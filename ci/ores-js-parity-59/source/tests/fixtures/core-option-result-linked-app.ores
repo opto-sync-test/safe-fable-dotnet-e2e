@@ -1,0 +1,10 @@
+import module core from "core";
+pub fnc positive_or_zero(int x): int {
+  return core.fallback(core.positive(x),0);
+}
+pub fnc negative_is_error(int x): bool {
+  return !core.succeeded(core.negative(x));
+}
+pub fnc checked_value(int x): int {
+  return core.value_or(core.negative(x),42);
+}

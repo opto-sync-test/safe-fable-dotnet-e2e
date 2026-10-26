@@ -1,0 +1,38 @@
+// Experimental **concrete** portable ADT ABI, not generic Option<T>/Result<T,E>.
+define module core as
+  pub fnc positive(int x): Option<int> {
+    if x > 0; do
+      return Some(x);
+    else
+      return None;
+    fi
+  }
+  pub fnc negative(int x): Result<int,int> {
+    if x < 0; do
+      return Err(x);
+    else
+      return Ok(x);
+    fi
+  }
+  pub fnc fallback(Option<int> x,int defaultValue): int {
+    return Option.unwrap_or(x,defaultValue);
+  }
+  pub fnc contains(Option<int> x): bool {
+    return Option.is_some(x);
+  }
+  pub fnc succeeded(Result<int,int> x): bool {
+    return Result.is_ok(x);
+  }
+  pub fnc value_or(Result<int,int> x,int other): int {
+    return Result.unwrap_or(x,other);
+  }
+  pub fnc error_or(Result<int,int> x,int other): int {
+    return Result.unwrap_err_or(x,other);
+  }
+  pub fnc internal_option(int x): int {
+    return Option.unwrap_or(Option.some(x),-1);
+  }
+  pub fnc internal_result(int x): int {
+    return Result.unwrap_or(Result.ok(x),-1);
+  }
+end

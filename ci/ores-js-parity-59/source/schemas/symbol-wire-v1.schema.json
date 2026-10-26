@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:oreslang:symbol-wire:v1",
+  "title": "Oreslang Symbol wire v1",
+  "description": "Structural contract only. src/symbol-wire-v1.mjs additionally enforces NFC, UTF-8 budgets, forbidden Unicode classes, canonical stable UUIDs and admission policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$symbol","name"],
+  "properties": {
+    "$symbol": {"enum": ["process","stable"]},
+    "name": {"type": "string","minLength": 1,"maxLength": 1024}
+  }
+}

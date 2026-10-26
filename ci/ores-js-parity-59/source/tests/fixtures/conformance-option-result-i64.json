@@ -1,0 +1,151 @@
+{
+  "schema": "oreslang.portable-option-result-i64.v0",
+  "status": "experimental-design-fixture; NOT verified backend parity or stable wire ABI",
+  "sourcePath": "contracts/v1/portable-option-result/option-result-i64-v0.ores",
+  "typeDomains": [
+    "Option<int>",
+    "Result<int,int>"
+  ],
+  "numericModel": "signed-i64-checked-provisional",
+  "capabilityRequirements": [],
+  "intrinsicFamilies": {
+    "Option": [
+      "Some(value)",
+      "None",
+      "Option.some(value)",
+      "Option.none()",
+      "Option.is_some(value)",
+      "Option.unwrap_or(value,defaultValue)"
+    ],
+    "Result": [
+      "Ok(value)",
+      "Err(error)",
+      "Result.ok(value)",
+      "Result.err(error)",
+      "Result.is_ok(value)",
+      "Result.unwrap_or(value,defaultValue)",
+      "Result.unwrap_err_or(value,defaultValue)"
+    ]
+  },
+  "semanticRules": [
+    "Some/Ok/Err carry exactly one signed i64 payload; None carries no payload.",
+    "Unrelated variants and incompatible type arguments are compile errors; no implicit bool/int conversions.",
+    "unwrap_or returns the payload only for Some or Ok, otherwise the explicit checked integer fallback.",
+    "A Result error remains an error value, not a language throw/raise/panic.",
+    "Portable core requires zero OS, clock, filesystem, network, FFI or scheduler capabilities.",
+    "Runtime tagged layout, ownership and serialization format are intentionally target-specific and not specified here."
+  ],
+  "testVectors": [
+    {
+      "id": "negative-option",
+      "function": "optional_positive",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "variant": "None"
+      }
+    },
+    {
+      "id": "zero-option",
+      "function": "optional_positive",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "variant": "None"
+      }
+    },
+    {
+      "id": "positive-option",
+      "function": "optional_positive",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "variant": "Some",
+        "value": "7"
+      }
+    },
+    {
+      "id": "min-i64-option",
+      "function": "optional_positive",
+      "args": [
+        "-9223372036854775808"
+      ],
+      "expected": {
+        "variant": "None"
+      }
+    },
+    {
+      "id": "max-i64-option",
+      "function": "optional_positive",
+      "args": [
+        "9223372036854775807"
+      ],
+      "expected": {
+        "variant": "Some",
+        "value": "9223372036854775807"
+      }
+    },
+    {
+      "id": "option-fallback",
+      "function": "optional_or_zero",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "0"
+      }
+    },
+    {
+      "id": "option-value",
+      "function": "optional_or_zero",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "result-err",
+      "function": "checked_nonnegative",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "variant": "Err",
+        "value": "-7"
+      }
+    },
+    {
+      "id": "result-ok-zero",
+      "function": "checked_nonnegative",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "variant": "Ok",
+        "value": "0"
+      }
+    },
+    {
+      "id": "result-ok",
+      "function": "checked_nonnegative",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "variant": "Ok",
+        "value": "7"
+      }
+    }
+  ],
+  "acceptanceGates": [
+    "Independent compiler/type-checker review of the exact source grammar",
+    "Actual execution of these source-level values on Java/GraalVM, LLVM, Wasm, and JS Node/browser",
+    "Exact binary/ESM artifact hashes, toolchain revisions, runner logs, and matching negative tests",
+    "Separate review of ABI/wire encoding, borrow/share/copy ownership, serialization/zorde and actor transfer"
+  ]
+}

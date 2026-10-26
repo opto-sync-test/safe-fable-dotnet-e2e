@@ -1,0 +1,81 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Oreslang JS browser compiler and Worker integration</title>
+<pre id="result">RUNNING</pre>
+<script type="module">
+import {compileProgramV2} from '../src/program-v2.mjs';
+import {spawnBrowserActor} from '../src/actor-host.browser.mjs';
+const result=document.getElementById('result');
+const assert=(condition,message)=>{if(!condition)throw new Error(message);};
+const actors=[];
+let generatedUrl;
+try {
+  // This exact .ores fixture is also compiled and executed by the Node
+  // CLI/two-Worker regression. The Git-blob SHA proves matching fixture bytes,
+  // not security provenance or permission to mirror private source.
+  const fixture=await fetch('./fixtures/worker-guest-i64.ores',{cache:'no-store'});
+  assert(fixture.ok,'browser guest fixture unavailable');
+  const bytes=new Uint8Array(await fixture.arrayBuffer());
+  const prefix=new TextEncoder().encode('blob '+bytes.length+String.fromCharCode(0));
+  const full=new Uint8Array(prefix.length+bytes.length);
+  full.set(prefix);full.set(bytes,prefix.length);
+  const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-1',full)),
+    b=>b.toString(16).padStart(2,'0')).join('');
+  assert(digest==='8c2acdb4c21ec5572aba4e48253413ba3a86c071',
+    'browser and Node source fixture Git blobs differ');
+  const source=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+  const generated=compileProgramV2(source);
+  generatedUrl=URL.createObjectURL(new Blob([generated],{type:'text/javascript'}));
+  const esm=await import(generatedUrl);
+  assert(esm.add(40n,2n)===42n,'transpiled browser ESM failed');
+
+  // Run the identical compiled guest function in distinct, private Workers.
+  const compiledA=spawnBrowserActor({moduleUrl:generatedUrl,exportName:'add',mode:'call'});
+  const compiledB=spawnBrowserActor({moduleUrl:generatedUrl,exportName:'add',mode:'call'});
+  actors.push(compiledA,compiledB);
+  await Promise.all([compiledA.ready,compiledB.ready]);
+  const values=await Promise.all([
+    compiledA.request({args:[40n,2n]}),
+    compiledB.request({args:[21n,21n]}),
+    compiledA.request({args:[-9n,6n]}),
+    compiledB.request({args:[9n,-6n]})
+  ]);
+  assert(values.length===4&&values[0]===42n&&values[1]===42n&&
+    values[2]===-3n&&values[3]===3n,'two-Worker guest output mismatch');
+  let overflow=false;
+  try {await compiledA.request({args:[(1n<<63n)-1n,1n]});}
+  catch(error) {overflow=/ORES_I64_OVERFLOW/.test(String(error));}
+  assert(overflow,'checked overflow accepted');
+  let wrongAbi=false;
+  try {await compiledB.request({args:[40,2n]});}
+  catch(error) {wrongAbi=/BigInt/.test(String(error));}
+  assert(wrongAbi,'non-BigInt JS input accepted');
+  let wrongArity=false;
+  try {await compiledB.request({args:[42n]});}
+  catch(error) {wrongArity=/arity/.test(String(error));}
+  assert(wrongArity,'wrong caller-visible arity accepted');
+  assert(await compiledA.request({args:[1n,2n]})===3n,
+    'guest failed to recover after rejected delivery');
+  await compiledA.close();
+  actors.splice(actors.indexOf(compiledA),1);
+  assert(await compiledB.request({args:[40n,2n]})===42n,
+    'independent Worker stopped when sibling closed');
+  const actor=spawnBrowserActor({
+    moduleUrl:new URL('./fixtures/worker-handler.mjs',import.meta.url).href
+  });
+  actors.push(actor);
+  await actor.ready;
+  assert(await actor.request({type:'add',x:40n,y:2n})===42n,'serial Worker reply failed');
+  assert(await actor.tell({type:'tell'})===undefined,'one-way delivery failed');
+  let rejected=false;
+  try {await actor.request({type:'missing-done'});}
+  catch(error) {rejected=/self.done/.test(String(error));}
+  assert(rejected,'implicit JS return was misinterpreted as actor reply');
+  result.textContent='PASS_BROWSER_ESM_WORKER';
+} catch(error) {
+  result.textContent='FAIL_BROWSER_ESM_WORKER: '+String(error);
+} finally {
+  await Promise.all(actors.map(a=>a.close()));
+  if(generatedUrl) URL.revokeObjectURL(generatedUrl);
+}
+</script>

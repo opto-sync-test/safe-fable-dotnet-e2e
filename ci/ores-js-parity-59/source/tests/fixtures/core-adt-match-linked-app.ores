@@ -1,0 +1,10 @@
+import module core from "core";
+pub fnc sample(int x): int {
+  return core.add_one(core.into_option(x));
+}
+pub fnc result(int x): int {
+  return core.extract_result(core.into_result(x));
+}
+pub fnc nested(int x): int {
+  return core.nested(core.into_option(x));
+}

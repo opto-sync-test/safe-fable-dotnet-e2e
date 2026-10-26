@@ -1,0 +1,20 @@
+// Portable value semantics fixture; not an ABI or runtime validation receipt.
+define module core as
+  pub fnc optional_positive(int x): Option<int> {
+    if x > 0; do return Some(x);
+    else return None; fi
+  }
+  pub fnc optional_or_zero(int x): int {
+    return Option.unwrap_or(optional_positive(x),0);
+  }
+  pub fnc checked_nonnegative(int x): Result<int,int> {
+    if x < 0; do return Err(x);
+    else return Ok(x); fi
+  }
+  pub fnc success(Result<int,int> r): bool {
+    return Result.is_ok(r);
+  }
+  pub fnc checked_or(Result<int,int> r,int fallback): int {
+    return Result.unwrap_or(r,fallback);
+  }
+end

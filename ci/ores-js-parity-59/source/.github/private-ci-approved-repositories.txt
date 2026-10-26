@@ -1,0 +1,4 @@
+# Private CI destinations explicitly approved for source transfers.
+# No repositories are approved by default.
+# Format for a future reviewed approval: exact-owner/exact-repo NUMERIC_REPOSITORY_ID
+# Any active entry requires an independently reviewed policy change before source export.

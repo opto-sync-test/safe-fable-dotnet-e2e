@@ -1,0 +1,38 @@
+// Experimental concrete exhaustive ADT pattern matching, not generic ADTs.
+define module core as
+  pub fnc add_one(Option<int> value): int {
+    return match value over {
+      on Some(n) { return n + 1; }
+      on None { return 0; }
+    };
+  }
+  pub fnc is_some(Option<int> value): bool {
+    return match value over {
+      on Some(n) { return true; }
+      on None { return false; }
+    };
+  }
+  pub fnc extract_result(Result<int,int> value): int {
+    return match value over {
+      on Ok(n) { return n; }
+      on Err(e) { return -e; }
+    };
+  }
+  pub fnc nested(Option<int> value): int {
+    return match value over {
+      on Some(n) {
+        return match Option.some(n) over {
+          on Some(m) { return m + n; }
+          on None { return 0; }
+        };
+      }
+      on None { return -1; }
+    };
+  }
+  pub fnc into_option(int n): Option<int> {
+    if n > 0; do return Some(n); else return None; fi
+  }
+  pub fnc into_result(int n): Result<int,int> {
+    if n < 0; do return Err(n); else return Ok(n); fi
+  }
+end

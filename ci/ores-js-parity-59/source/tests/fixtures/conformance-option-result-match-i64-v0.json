@@ -1,0 +1,364 @@
+{
+  "schema": "oreslang.portable-adt-match-i64.v0",
+  "status": "experimental semantic fixture — NOT backend parity, runtime ABI, or merge acceptance",
+  "requires": "oreslang.portable-option-result-i64.v0",
+  "sourcePath": "contracts/v1/portable-option-result/option-result-match-i64-v0.ores",
+  "numericModel": "signed-i64-checked-provisional",
+  "typeDomains": [
+    "Option<int>",
+    "Result<int,int>"
+  ],
+  "capabilityRequirements": [],
+  "confirmedBackends": [],
+  "pendingBackends": [
+    "js-node22",
+    "js-chromium",
+    "java-graalvm",
+    "llvm",
+    "wasm"
+  ],
+  "semanticRules": [
+    "Some/None and Ok/Err are each exhaustive closed two-variant families for their concrete type.",
+    "A match evaluates its subject once and only its selected arm is evaluated.",
+    "Some/Ok/Err bind one signed-i64 payload; None cannot bind a payload.",
+    "Payload captures are lexically scoped to their arm. Nested matches may refer to outer captures.",
+    "Duplicate, mixed, missing or wildcard-substitute ADT variants and incompatible subject or result types are compile errors.",
+    "The zero-capability pure fixture does not specify cross-backend in-memory tags, wire formats, ownership, or actor transfers.",
+    "Selected-arm-only evaluation is checked by inactive branches that would raise checked integer remainder by zero if evaluated."
+  ],
+  "testVectors": [
+    {
+      "id": "option_tag--7",
+      "function": "option_tag",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "0"
+      }
+    },
+    {
+      "id": "option_value--7",
+      "function": "option_value",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "result_tag--7",
+      "function": "result_tag",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "result_value--7",
+      "function": "result_value",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "-7"
+      }
+    },
+    {
+      "id": "option_tag-0",
+      "function": "option_tag",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "0"
+      }
+    },
+    {
+      "id": "option_value-0",
+      "function": "option_value",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "result_tag-0",
+      "function": "result_tag",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "1"
+      }
+    },
+    {
+      "id": "result_value-0",
+      "function": "result_value",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "0"
+      }
+    },
+    {
+      "id": "option_tag-7",
+      "function": "option_tag",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "1"
+      }
+    },
+    {
+      "id": "option_value-7",
+      "function": "option_value",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "result_tag-7",
+      "function": "result_tag",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "1"
+      }
+    },
+    {
+      "id": "result_value-7",
+      "function": "result_value",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "option_tag--9223372036854775808",
+      "function": "option_tag",
+      "args": [
+        "-9223372036854775808"
+      ],
+      "expected": {
+        "int": "0"
+      }
+    },
+    {
+      "id": "option_value--9223372036854775808",
+      "function": "option_value",
+      "args": [
+        "-9223372036854775808"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "result_tag--9223372036854775808",
+      "function": "result_tag",
+      "args": [
+        "-9223372036854775808"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "result_value--9223372036854775808",
+      "function": "result_value",
+      "args": [
+        "-9223372036854775808"
+      ],
+      "expected": {
+        "int": "-9223372036854775808"
+      }
+    },
+    {
+      "id": "option_tag-9223372036854775807",
+      "function": "option_tag",
+      "args": [
+        "9223372036854775807"
+      ],
+      "expected": {
+        "int": "1"
+      }
+    },
+    {
+      "id": "option_value-9223372036854775807",
+      "function": "option_value",
+      "args": [
+        "9223372036854775807"
+      ],
+      "expected": {
+        "int": "9223372036854775807"
+      }
+    },
+    {
+      "id": "result_tag-9223372036854775807",
+      "function": "result_tag",
+      "args": [
+        "9223372036854775807"
+      ],
+      "expected": {
+        "int": "1"
+      }
+    },
+    {
+      "id": "result_value-9223372036854775807",
+      "function": "result_value",
+      "args": [
+        "9223372036854775807"
+      ],
+      "expected": {
+        "int": "9223372036854775807"
+      }
+    },
+    {
+      "id": "nested--7",
+      "function": "nested",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "nested-0",
+      "function": "nested",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "-1"
+      }
+    },
+    {
+      "id": "nested-7",
+      "function": "nested",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "14"
+      }
+    },
+    {
+      "id": "lazy_some-7",
+      "function": "lazy_some",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "lazy_none-0",
+      "function": "lazy_none",
+      "args": [
+        "0"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "lazy_ok-7",
+      "function": "lazy_ok",
+      "args": [
+        "7"
+      ],
+      "expected": {
+        "int": "7"
+      }
+    },
+    {
+      "id": "lazy_err--7",
+      "function": "lazy_err",
+      "args": [
+        "-7"
+      ],
+      "expected": {
+        "int": "-7"
+      }
+    }
+  ],
+  "negativeCases": [
+    {
+      "id": "missing-none",
+      "expect": "reject",
+      "diagnosticClass": "non-exhaustive",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return n;} };}\nend\n"
+    },
+    {
+      "id": "duplicate-some",
+      "expect": "reject",
+      "diagnosticClass": "duplicate-variant",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return n;} on Some(m) {return m;} };}\nend\n"
+    },
+    {
+      "id": "mixed-families",
+      "expect": "reject",
+      "diagnosticClass": "variant-family-mismatch",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return n;} on Err(e) {return e;} };}\nend\n"
+    },
+    {
+      "id": "wrong-subject",
+      "expect": "reject",
+      "diagnosticClass": "subject-type-mismatch",
+      "source": "define module core as\npub fnc f(int v):int {return match v over {on Some(n) {return n;} on None {return 0;} };}\nend\n"
+    },
+    {
+      "id": "parameter-shadow",
+      "expect": "reject",
+      "diagnosticClass": "capture-shadow",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(v) {return v;} on None {return 0;} };}\nend\n"
+    },
+    {
+      "id": "nested-shadow",
+      "expect": "reject",
+      "diagnosticClass": "capture-shadow",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return match Some(n) over {on Some(n) {return n;} on None {return 0;} };} on None {return 0;} };}\nend\n"
+    },
+    {
+      "id": "none-has-no-payload",
+      "expect": "reject",
+      "diagnosticClass": "none-payload",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return n;} on None(n) {return n;} };}\nend\n"
+    },
+    {
+      "id": "wrong-return-type",
+      "expect": "reject",
+      "diagnosticClass": "arm-type-mismatch",
+      "source": "define module core as\npub fnc f(Option<int> v):bool {return match v over {on Some(n) {return n;} on None {return false;} };}\nend\n"
+    },
+    {
+      "id": "wildcard-instead-of-none",
+      "expect": "reject",
+      "diagnosticClass": "non-exhaustive",
+      "source": "define module core as\npub fnc f(Option<int> v):int {return match v over {on Some(n) {return n;} else {return 0;} };}\nend\n"
+    }
+  ],
+  "acceptanceGates": [
+    "Real Node 22 exact-head compile and generated ESM execution",
+    "Real Chromium generated ESM import and execution",
+    "Java/GraalVM, LLVM and Wasm exact-source compiler and executable runtime evidence, including semantic negative rejection",
+    "Source/blob SHA, emitted artifact hash, executable/toolchain SHA, runner logs and independent review",
+    "Separate ABI, Zorde, actor-ownership and generic ADT review"
+  ]
+}

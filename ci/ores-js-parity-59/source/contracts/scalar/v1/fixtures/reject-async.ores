@@ -1,0 +1,1 @@
+pub async fnc main(): int { return 42; }

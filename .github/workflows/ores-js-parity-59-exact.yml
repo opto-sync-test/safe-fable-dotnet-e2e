@@ -1,0 +1,32 @@
+name: Ores JS parity PR59 exact tree
+on:
+  push:
+    branches:
+      - ci/ores-js-parity-59-exact-20261026
+permissions:
+  contents: read
+jobs:
+  exact-tree-js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify exact source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='2f2af23d0a06798f9c023364c877b08f820c1e4b'
+          actual="$(git rev-parse HEAD:ci/ores-js-parity-59/source)"
+          test "$actual" = "$expected"
+          echo "EXACT_JS_SOURCE_TREE=$actual"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Shared scalar parity focus
+        working-directory: ci/ores-js-parity-59/source
+        run: node --test tests/cross-backend-checked-i64-scalar.test.mjs
+      - name: Full JavaScript backend suite
+        working-directory: ci/ores-js-parity-59/source
+        run: npm test

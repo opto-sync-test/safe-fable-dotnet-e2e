@@ -1,0 +1,67 @@
+// Pure concrete matching conformance source: no hosted capabilities or wire ABI.
+define module core as
+pub fnc as_option(int x):Option<int> {
+  if x > 0; do return Some(x); else return None; fi
+}
+pub fnc as_result(int x):Result<int,int> {
+  if x < 0; do return Err(x); else return Ok(x); fi
+}
+pub fnc option_tag(int x):int {
+  return match as_option(x) over {
+    on Some(n) {return 1;}
+    on None {return 0;}
+  };
+}
+pub fnc option_value(int x):int {
+  return match as_option(x) over {
+    on Some(n) {return n;}
+    on None {return -1;}
+  };
+}
+pub fnc result_tag(int x):int {
+  return match as_result(x) over {
+    on Ok(n) {return 1;}
+    on Err(e) {return -1;}
+  };
+}
+pub fnc result_value(int x):int {
+  return match as_result(x) over {
+    on Ok(n) {return n;}
+    on Err(e) {return e;}
+  };
+}
+pub fnc nested(int x):int {
+  return match as_option(x) over {
+    on Some(n) {return match Some(n) over {
+      on Some(m) {return m + n;}
+      on None {return 0;}
+    };}
+    on None {return -1;}
+  };
+}
+// Poison expressions are safe only when the unselected arm stays lazy.
+pub fnc lazy_some(int x):int {
+  return match as_option(x) over {
+    on Some(n) {return n;}
+    on None {return 1 % (x - 7);}
+  };
+}
+pub fnc lazy_none(int x):int {
+  return match as_option(x) over {
+    on Some(n) {return 1 % x;}
+    on None {return 7;}
+  };
+}
+pub fnc lazy_ok(int x):int {
+  return match as_result(x) over {
+    on Ok(n) {return n;}
+    on Err(e) {return 1 % (x - 7);}
+  };
+}
+pub fnc lazy_err(int x):int {
+  return match as_result(x) over {
+    on Ok(n) {return 1 % (x + 7);}
+    on Err(e) {return e;}
+  };
+}
+end
